@@ -1,0 +1,17 @@
+# IDE-specific
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python
+.venv
+venv
+__pycache__
+
+# SQLite
+*.db
+
+# Other
+.DS_Store
+*.log
