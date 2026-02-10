@@ -1,8 +1,8 @@
-# ADR 4: History-Based State Persistence
+# ADR 5: History-Based State Persistence
 
 ### Context
 
-The system requires a persistent history of tier changes, but the `customers` table is treated as a legacy, read-only resource that cannot be modified probably because our "Loyalty Domain" (assumption) could not have ownership over this model.
+The system requires a persistent history of tier changes, but the `customers` table is treated as a legacy, read-only resource that can not be modified probably because our "Loyalty Domain" (assumption) could not have ownership over this model.
 
 ### Decision
 

@@ -48,7 +48,8 @@ The API provides the following endpoints under the `/api/v1` prefix. For detaile
 
 This project uses Architecture Decision Records to document important architectural choices.
 
-- [ADR 1: Single Source of Truth](./docs/adr-001-single-source-of-truth.md)
-- [ADR 2: Pessimistic Locking for Concurrency Control](./docs/adr-002-pessimistic-locking.md)
-- [ADR 3: Currency Stability](./docs/adr-003-currency-stability.md)
-- [ADR 4: History-Based State Persistence](./docs/adr-004-history-based-state.md)
+- [ADR 001: Single Source of Truth](./docs/adr-001-rolling-window.md)
+- [ADR 002: Single Source of Truth](./docs/adr-002-single-source-of-truth.md)
+- [ADR 003: Pessimistic Locking for Concurrency Control](./docs/adr-003-pessimistic-locking.md)
+- [ADR 004: Currency Stability](./docs/adr-004-currency-stability.md)
+- [ADR 005: History-Based State Persistence](./docs/adr-005-history-based-state.md)

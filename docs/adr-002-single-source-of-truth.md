@@ -1,4 +1,4 @@
-# ADR 1: Single Source of Truth
+# ADR 2: Single Source of Truth
 
 ### Context
 
@@ -12,3 +12,4 @@ We implemented a **Service Layer Pattern** centered around a single function: `s
 
 *   **Positive:** Guaranteed consistency across all system artifacts. Any change to business rules (e.g., changing a threshold) is made in one location.
 *   **Positive:** Simplified testing; only one core business engine needs unit testing.
+*   **Negative:** Expose an endpoint or develop a message listener to make this logic accessible to a scheduled job.

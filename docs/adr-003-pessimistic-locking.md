@@ -1,8 +1,8 @@
-# ADR 2: Pessimistic Locking for Concurrency Control
+# ADR 3: Pessimistic Locking for Concurrency Control
 
 ### Context
 
-A "Race Condition" exists where the Daily Cron Job might attempt a "Passive Downgrade" at the exact millisecond a user completes a transaction. Without locking, a stale downgrade could overwrite a real-time upgrade.
+A "Race Condition" exists where the Scheduled Job might attempt a "Passive Downgrade" at the exact millisecond a user completes a transaction. Without locking, a stale downgrade could overwrite a real-time upgrade.
 
 ### Decision
 

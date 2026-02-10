@@ -1,4 +1,4 @@
-# ADR 3: Currency Stability
+# ADR 4: Currency Stability
 
 ### Context
 
