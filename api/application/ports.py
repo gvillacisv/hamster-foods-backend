@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 from datetime import datetime
+
 from api.domain.models import Customer, Order, TierHistoryItem
+
 
 class CustomerRepository(ABC):
 
@@ -14,7 +16,7 @@ class CustomerRepository(ABC):
         raise NotImplementedError
         
     @abstractmethod
-    def get_tier_history_for_customer(self, customer_id: str) -> list[TierHistoryItem]:
+    def get_tier_history_desc(self, customer_id: str) -> list[TierHistoryItem]:
         raise NotImplementedError
 
 class CurrencyConverter(ABC):

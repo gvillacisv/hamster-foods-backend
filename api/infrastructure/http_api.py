@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
-from typing import List
+
 from api.application.services import CustomerTierService, CustomerNotFound
 from api.domain.models import CustomerTierStatusResponse, SyncTierRequest
 from api.infrastructure.dependencies import get_customer_tier_service, get_customer_repository
@@ -19,7 +19,6 @@ def get_tier_status(
     target_currency: str = Query('EUR', description="The target currency for all monetary values (e.g., EUR, GBP, USD)."),
     service: CustomerTierService = Depends(get_customer_tier_service)
 ):
-
     try:
         return service.get_customer_tier_status(customer_id, target_currency)
     except CustomerNotFound as e:

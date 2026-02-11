@@ -28,10 +28,10 @@ def initialize_database():
         connection.commit()
         print("Database initialized and seeded successfully.")
 
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-    except FileNotFoundError as e:
-        print(f"SQL file not found: {e}")
+    except sqlite3.Error as exception:
+        print(f"Database error: {exception}")
+    except FileNotFoundError as exception:
+        print(f"SQL file not found: {exception}")
     finally:
         if connection:
             connection.close()

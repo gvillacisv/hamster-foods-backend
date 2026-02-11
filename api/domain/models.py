@@ -1,13 +1,9 @@
 from pydantic import BaseModel, Field
-from enum import Enum
 from datetime import datetime
 from typing import Optional
 
-class Tier(str, Enum):
-    CHAMPION = 'Champion'
-    LOYAL = 'Loyal'
-    ROOKIE = 'Rookie'
-    NO_TIER = 'No Tier'
+from api.domain.constants import Tier
+
 
 class TierHistoryItem(BaseModel):
     id: str

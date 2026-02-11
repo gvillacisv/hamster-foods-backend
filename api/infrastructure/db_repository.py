@@ -1,9 +1,11 @@
 import sqlite3
 from typing import Optional, List
 from datetime import datetime, timedelta
-from api.application.ports import CustomerRepository
-from api.domain.models import Customer, Order, TierHistoryItem, Tier
+
 import api.domain.services as domain_services
+from api.application.ports import CustomerRepository
+from api.domain.constants import Tier
+from api.domain.models import Customer, Order, TierHistoryItem
 
 DB_FILE = "hamster_foods.db"
 
@@ -54,8 +56,9 @@ class SqliteCustomerRepository(CustomerRepository):
                 ))
         return orders
 
-    def get_tier_history_for_customer(self, customer_id: str) -> List[TierHistoryItem]:
+    def get_tier_history_desc(self, customer_id: str) -> List[TierHistoryItem]:
         history = []
+
         with get_db_connection() as connection:
             cursor = connection.cursor()
             cursor.execute(
@@ -75,9 +78,10 @@ class SqliteCustomerRepository(CustomerRepository):
                     id=row['id'],
                     tier=Tier(row['tier']),
                     date=datetime.fromisoformat(row['date']),
-                    totalAtChange=row['total_base_at_change'],
-                    changeReason=row['change_reason']
+                    total_base_at_change=row['total_base_at_change'],
+                    change_reason=row['change_reason']
                 ))
+
         return history
 
     def sync_user_tier(self, customer_id: str, reason: str):

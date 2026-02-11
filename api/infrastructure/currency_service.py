@@ -1,6 +1,7 @@
 from api.application.ports import CurrencyConverter
 
 class StaticCurrencyConverter(CurrencyConverter):
+
     _rates_to_base = {
         "EUR": 1.0,
         "GBP": 1.18,
