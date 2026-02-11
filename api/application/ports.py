@@ -18,9 +18,3 @@ class CustomerRepository(ABC):
     @abstractmethod
     def get_tier_history_desc(self, customer_id: str) -> list[TierHistoryItem]:
         raise NotImplementedError
-
-class CurrencyConverter(ABC):
-
-    @abstractmethod
-    def convert(self, amount: float, from_currency: str, to_currency: str) -> float:
-        raise NotImplementedError

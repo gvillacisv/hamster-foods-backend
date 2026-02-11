@@ -9,6 +9,12 @@ class Tier(str, Enum):
 
 BASE_CURRENCY: str = 'EUR'
 
+RATES_TO_BASE = {
+    "EUR": 1.0,
+    "GBP": 1.18,
+    "USD": 0.93,
+}
+
 # Sorted reversed manually to simplify Tier calculations
 TIER_THRESHOLDS: dict[Tier, float] = {
     Tier.CHAMPION: 23,

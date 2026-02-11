@@ -1,6 +1,6 @@
 import sqlite3
-from typing import Optional, List
 from datetime import datetime, timedelta
+from typing import Optional, List
 
 import api.domain.services as domain_services
 from api.application.ports import CustomerRepository
@@ -32,8 +32,8 @@ class SqliteCustomerRepository(CustomerRepository):
     def get_orders_for_customer_since(self, customer_id: str, date_from: datetime) -> List[Order]:
         orders = []
 
-        with get_db_connection() as conn:
-            cursor = conn.cursor()
+        with get_db_connection() as connection:
+            cursor = connection.cursor()
             cursor.execute(
                 """
                 SELECT id, customer_id, amount_value, amount_currency, amount_base, exchange_rate, created_at
@@ -86,10 +86,10 @@ class SqliteCustomerRepository(CustomerRepository):
         return history
 
     def sync_user_tier(self, customer_id: str, reason: str):
-
-        with get_db_connection() as conn:
-            cursor = conn.cursor()
+        with get_db_connection() as connection:
+            cursor = connection.cursor()
             cursor.execute("BEGIN IMMEDIATE")
+
             try:
                 cursor.execute(
                     "SELECT tier FROM tier_history WHERE customer_id = ? ORDER BY date DESC LIMIT 1",
@@ -106,8 +106,8 @@ class SqliteCustomerRepository(CustomerRepository):
                 )
 
                 total_row = cursor.fetchone()
-                current_total_base = total_row['total'] if total_row and total_row['total'] is not None else 0.0
-                new_tier = domain_services.get_tier_for_amount(current_total_base)
+                current_total = total_row['total'] if total_row and total_row['total'] is not None else 0.0
+                new_tier = domain_services.get_tier_for_amount(current_total)
 
                 if new_tier != current_tier:
                     cursor.execute(
@@ -120,15 +120,15 @@ class SqliteCustomerRepository(CustomerRepository):
                             customer_id,
                             new_tier.value,
                             datetime.now().isoformat(),
-                            round(current_total_base, 2),
+                            round(current_total, 2),
                             reason
                         )
                     )
-                
-                conn.commit()
 
-            except Exception as e:
-                conn.rollback()
-                print(f"Error syncing tier for customer {customer_id}: {e}")
+                connection.commit()
+
+            except Exception as exception:
+                connection.rollback()
+                print(f"Error syncing tier for customer {customer_id}: {exception}")
 
                 raise

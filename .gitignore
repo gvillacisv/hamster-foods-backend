@@ -1,13 +1,12 @@
 # IDE-specific
 .idea/
 .vscode/
-*.swp
-*~
 
 # Python
 .venv
 venv
 .coverage
+.pytest_cache
 __pycache__
 
 # SQLite

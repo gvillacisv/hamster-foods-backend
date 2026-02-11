@@ -20,7 +20,7 @@ def test_get_tier_for_amount(amount, expected_tier):
 
 @pytest.mark.parametrize("current_total, current_tier, expected_next_tier, expected_amount_needed", [
     (6.99, Tier.NO_TIER, Tier.ROOKIE, 0.01),
-    (12.53, Tier.ROOKI, Tier.LOYAL, 2.47),
+    (12.53, Tier.ROOKIE, Tier.LOYAL, 2.47),
     (20.0, Tier.LOYAL, Tier.CHAMPION, 3.0),
     (25.7, Tier.CHAMPION, None, 0.0)
 ])
@@ -30,11 +30,11 @@ def test_get_next_tier_info(current_total, current_tier, expected_next_tier, exp
     assert next_tier == expected_next_tier
     assert amount_needed == expected_amount_needed
     
-@pytest.mark.parametrize("current_total, expected_percentage", [
-    (0, 0.0),
-    (11.5, 50.0),
-    (23, 100.0),
-    (30, 100.0)
+@pytest.mark.parametrize("current_total, current_tier, expected_percentage", [
+    (0, Tier.NO_TIER, 0.0),
+    (11.5, Tier.ROOKIE, 50.0),
+    (23, Tier.LOYAL, 100.0),
+    (30, Tier.CHAMPION, 100.0)
 ])
 def test_calculate_tier_progress(current_total, current_tier, expected_percentage):
     percentage, top_tier_threshold = calculate_tier_progress(current_total, current_tier)

@@ -1,0 +1,11 @@
+[run]
+source = api
+omit =
+    initialize_db.py
+    main.py
+    api/application/ports.py
+    tests/*
+    */__init__.py
+
+[report]
+show_missing = True

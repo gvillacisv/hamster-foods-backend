@@ -7,27 +7,24 @@ from api.domain.constants import Tier
 
 def test_get_customer_tier_status_not_found():
     mock_customer_repository = MagicMock()
-    mock_currency_converter = MagicMock()
 
     mock_customer_repository.get_customer_by_id.return_value = None
 
-    service = CustomerTierService(mock_customer_repository, mock_currency_converter)
+    service = CustomerTierService(mock_customer_repository)
 
     with pytest.raises(CustomerNotFound):
         service.get_customer_tier_status('c1', 'EUR')
 
 def test_get_customer_tier_status_success(champion_fixture):
     mock_customer_repository = MagicMock()
-    mock_currency_converter = MagicMock()
 
     fixture = champion_fixture
 
     mock_customer_repository.get_customer_by_id.return_value = fixture['customer']
     mock_customer_repository.get_orders_for_customer_since.return_value = fixture['orders']
     mock_customer_repository.get_tier_history_desc.return_value = fixture['history']
-    mock_currency_converter.convert.side_effect = lambda amount, _, __: amount * 1
 
-    target = CustomerTierService(mock_customer_repository, mock_currency_converter)
+    target = CustomerTierService(mock_customer_repository)
 
     result = target.get_customer_tier_status('c-01', 'EUR')
 
@@ -43,16 +40,14 @@ def test_get_customer_tier_status_success(champion_fixture):
 
 def test_get_customer_tier_status_no_history(newcomer_fixture):
     mock_customer_repository = MagicMock()
-    mock_currency_converter = MagicMock()
 
     fixture = newcomer_fixture
 
     mock_customer_repository.get_customer_by_id.return_value = fixture['customer']
     mock_customer_repository.get_orders_for_customer_since.return_value = fixture['orders']
     mock_customer_repository.get_tier_history_desc.return_value = fixture['history']
-    mock_currency_converter.convert.side_effect = lambda amount, _, __: amount * 1
 
-    target = CustomerTierService(mock_customer_repository, mock_currency_converter)
+    target = CustomerTierService(mock_customer_repository)
 
     result = target.get_customer_tier_status('c-01', 'EUR')
 
