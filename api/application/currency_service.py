@@ -21,4 +21,4 @@ class StaticCurrencyConverter(CurrencyConverter):
         amount_in_base = amount * self._rates_to_base[from_curr]
         amount_in_target = amount_in_base / self._rates_to_base[to_curr]
 
-        return amount_in_target
+        return round(amount_in_target, 2)

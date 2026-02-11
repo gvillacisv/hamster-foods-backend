@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 
-from api.application.services import CustomerTierService, CustomerNotFound
+from api.application.customer_service import CustomerTierService, CustomerNotFound
 from api.domain.models import CustomerTierStatusResponse, SyncTierRequest
 from api.infrastructure.dependencies import get_customer_tier_service, get_customer_repository
 from api.infrastructure.db_repository import SqliteCustomerRepository

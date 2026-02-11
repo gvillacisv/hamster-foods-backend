@@ -1,8 +1,10 @@
 from fastapi import Depends
+
 from api.application.ports import CustomerRepository, CurrencyConverter
+from api.application.currency_service import StaticCurrencyConverter
+from api.application.customer_service import CustomerTierService
 from api.infrastructure.db_repository import SqliteCustomerRepository
-from api.infrastructure.currency_service import StaticCurrencyConverter
-from api.application.services import CustomerTierService
+
 
 def get_customer_repository() -> CustomerRepository:
     return SqliteCustomerRepository()

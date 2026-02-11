@@ -7,6 +7,7 @@ from api.application.ports import CustomerRepository
 from api.domain.constants import Tier
 from api.domain.models import Customer, Order, TierHistoryItem
 
+
 DB_FILE = "hamster_foods.db"
 
 def get_db_connection():

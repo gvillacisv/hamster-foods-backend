@@ -1,9 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
 
-from api.application.services import CustomerTierService, CustomerNotFound
+from api.application.customer_service import CustomerTierService, CustomerNotFound
 from api.domain.constants import Tier
-from api.domain.models import Customer
 
 
 def test_get_customer_tier_status_not_found():
