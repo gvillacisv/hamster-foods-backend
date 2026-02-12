@@ -58,6 +58,19 @@ The API provides the following endpoints under the `/api/v1` prefix. For detaile
 - `GET /customers/{customer_id}/tier-status`: Get customer's current tier status.
 - `POST /customers/{customer_id}/sync-tier`: Trigger a manual tier synchronization for a customer.
 
+# CLI Tool: Add Transaction
+
+This script provides an interactive command-line interface to add new transactions to the database for testing and demonstration purposes.
+
+It supports:
+- Creating a brand new customer and adding their first transaction.
+- Selecting an existing customer from a list and adding a new transaction for them.
+
+Run script:
+```bash
+python cli_add_transaction.py
+```
+
 ## Documentation
 
 This project uses Architecture Decision Records (ADR) and Request for Comments (RFC) to document important architectural choices.

@@ -55,6 +55,7 @@ class SqliteCustomerRepository(CustomerRepository):
                     exchange_rate=row['exchange_rate'],
                     created_at=datetime.fromisoformat(row['created_at'])
                 ))
+
         return orders
 
     def get_tier_history_desc(self, customer_id: str) -> List[TierHistoryItem]:
@@ -85,19 +86,29 @@ class SqliteCustomerRepository(CustomerRepository):
 
         return history
 
-    def sync_user_tier(self, customer_id: str, reason: str):
+    def sync_user_tier(self, customer_id: str, reason: str, order_id: Optional[str] = None):
         with get_db_connection() as connection:
             cursor = connection.cursor()
             cursor.execute("BEGIN IMMEDIATE")
 
             try:
+                if order_id:
+                    cursor.execute(
+                        "SELECT 1 FROM tier_history WHERE order_id = ?", (order_id,)
+                    )
+
+                    if cursor.fetchone():
+                        connection.commit()
+                        return
+
                 cursor.execute(
-                    "SELECT tier FROM tier_history WHERE customer_id = ? ORDER BY date DESC LIMIT 1",
+                    "SELECT tier, total_base_at_change FROM tier_history WHERE customer_id = ? ORDER BY date DESC LIMIT 1",
                     (customer_id,)
                 )
 
-                current_tier_row = cursor.fetchone()
-                current_tier = Tier(current_tier_row['tier']) if current_tier_row else Tier.NO_TIER
+                last_history_row = cursor.fetchone()
+                current_tier = Tier(last_history_row['tier']) if last_history_row else Tier.NO_TIER
+                last_recorded_total = last_history_row['total_base_at_change'] if last_history_row else -1.0
                 ten_days_ago = datetime.now() - timedelta(days=10)
 
                 cursor.execute(
@@ -107,26 +118,32 @@ class SqliteCustomerRepository(CustomerRepository):
 
                 total_row = cursor.fetchone()
                 current_total = total_row['total'] if total_row and total_row['total'] is not None else 0.0
-                new_tier = domain_services.get_tier_for_amount(current_total)
+                current_total = round(current_total, 2)
 
-                if new_tier != current_tier:
+                new_tier = domain_services.get_tier_for_amount(current_total)
+                should_insert = (
+                    new_tier != current_tier or
+                    not last_history_row or
+                    (reason == 'TRANSACTION' and current_total != last_recorded_total)
+                )
+                if should_insert:
                     cursor.execute(
                         """
-                        INSERT INTO tier_history (id, customer_id, tier, date, total_base_at_change, change_reason)
-                        VALUES (?, ?, ?, ?, ?, ?)
+                        INSERT INTO tier_history (id, customer_id, order_id, tier, date, total_base_at_change, change_reason)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             f"th-{customer_id}-{datetime.now().timestamp()}",
                             customer_id,
+                            order_id,
                             new_tier.value,
                             datetime.now().isoformat(),
-                            round(current_total, 2),
+                            current_total,
                             reason
                         )
                     )
 
                 connection.commit()
-
             except Exception as exception:
                 connection.rollback()
                 print(f"Error syncing tier for customer {customer_id}: {exception}")

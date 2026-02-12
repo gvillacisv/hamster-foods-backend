@@ -21,10 +21,10 @@ def get_tier_status(
 ):
     try:
         return service.get_customer_tier_status(customer_id, target_currency)
-    except CustomerNotFound as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    except CustomerNotFound as exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
+    except Exception as exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exception))
 
 @router.post(
     "/customers/{customer_id}/sync-tier",
@@ -38,7 +38,7 @@ def sync_tier(
     repository: SqliteCustomerRepository = Depends(get_customer_repository)
 ):
     try:
-        repository.sync_user_tier(customer_id, request.reason)
+        repository.sync_user_tier(customer_id, request.reason, request.order_id)
 
         return {"status": "success", "message": f"Tier synchronization completed for customer {customer_id}."}
     except Exception as exception:

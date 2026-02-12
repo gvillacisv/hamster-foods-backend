@@ -12,6 +12,9 @@ class TierHistoryItem(BaseModel):
     total_base_at_change: float = Field(alias='totalAtChange')
     change_reason: str = Field(alias='changeReason')
 
+    class Config:
+        populate_by_name = True
+
 class CustomerTierStatusResponse(BaseModel):
     customer_id: str = Field(alias='customerId')
     customer_name: str = Field(alias='customerName')
@@ -42,3 +45,7 @@ class Customer(BaseModel):
 
 class SyncTierRequest(BaseModel):
     reason: str
+    order_id: Optional[str] = Field(default=None, alias='orderId')
+
+    class Config:
+        populate_by_name = True

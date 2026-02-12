@@ -34,28 +34,28 @@ def test_get_orders_for_customer_since(database, repository):
 
 @patch('api.domain.services.get_tier_for_amount')
 def test_sync_user_tier_no_change(mock_get_tier, database, repository):
-    """Tests that no INSERT happens if the tier remains the same."""
     database.fetchone.side_effect = [
-        {'tier': 'Rookie'},
+        {'tier': 'Rookie', 'total_base_at_change': 10.0},
         {'total': 10.0}
     ]
+
     mock_get_tier.return_value = Tier.ROOKIE
 
-    repository.sync_user_tier('c-01', 'Regular update')
+    repository.sync_user_tier('c-01', 'EXPIRATION')
 
     for call in database.execute.call_args_list:
         assert "INSERT INTO tier_history" not in call[0][0]
 
 @patch('api.domain.services.get_tier_for_amount')
 def test_sync_user_tier_with_change(mock_get_tier, database, repository):
-    """Tests that INSERT is called when the tier changes."""
     database.fetchone.side_effect = [
-        {'tier': 'Rookie'},
+        {'tier': 'Rookie', 'total_base_at_change': 10.0},
         {'total': 100.0}
     ]
+
     mock_get_tier.return_value = Tier.CHAMPION
 
-    repository.sync_user_tier('c-01', 'Rank up')
+    repository.sync_user_tier('c-01', 'TRANSACTION')
 
     insert_called = any("INSERT INTO tier_history" in call[0][0] for call in database.execute.call_args_list)
     assert insert_called is True
