@@ -1,4 +1,5 @@
 import sqlite3
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, List
 
@@ -6,12 +7,14 @@ import api.domain.services as domain_services
 from api.application.ports import CustomerRepository
 from api.domain.constants import Tier
 from api.domain.models import Customer, Order, TierHistoryItem
+from api.infrastructure.config import get_database_url
 
+logger = logging.getLogger(__name__)
 
-DB_FILE = "hamster_foods.db"
 
 def get_db_connection():
-    connection = sqlite3.connect(DB_FILE)
+    db_path = get_database_url()
+    connection = sqlite3.connect(db_path)
     connection.row_factory = sqlite3.Row
 
     return connection
@@ -146,6 +149,6 @@ class SqliteCustomerRepository(CustomerRepository):
                 connection.commit()
             except Exception as exception:
                 connection.rollback()
-                print(f"Error syncing tier for customer {customer_id}: {exception}")
+                logger.error(f"Error syncing tier for customer {customer_id}: {exception}")
 
                 raise

@@ -1,11 +1,20 @@
 import sqlite3
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
-DB_FILE = "hamster_foods.db"
+# Load environment variables
+load_dotenv()
+
+# Import after dotenv is loaded
+from api.infrastructure.config import get_database_url
+
 SCHEMA_FILE = os.path.join("sql", "schema.sql")
 SEEDS_FILE = os.path.join("sql", "seeds.sql")
 
 def initialize_database():
+    DB_FILE = get_database_url()
+    
     if os.path.exists(DB_FILE):
         os.remove(DB_FILE)
         print(f"Removed old database file: {DB_FILE}")

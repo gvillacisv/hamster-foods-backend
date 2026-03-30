@@ -19,7 +19,19 @@ This is the FastAPI backend for the Hamster Foods Tier Status application.
     pip install -r requirements.txt
     ```
 
-4.  **Initialize the database:**
+4.  **Configure environment variables:**
+    Copy `.env.example` to `.env` and configure:
+    ```bash
+    cp .env.example .env
+    ```
+    
+    Key configuration options:
+    - `DATABASE_URL` - Path to SQLite database (default: `hamster_foods.db`)
+    - `API_KEY` - Set to enable API key authentication (leave empty for dev mode)
+    - `CORS_ORIGINS` - Comma-separated list of allowed origins (e.g., `http://localhost:3000`)
+    - `DEBUG` - Set to `true` for debug mode
+
+5.  **Initialize the database:**
     This command will create `hamster_foods.db` and populate it with schema and seed data. Run this once during setup.
     ```bash
     python initialize_db.py

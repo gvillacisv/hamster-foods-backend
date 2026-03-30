@@ -3,3 +3,4 @@ uvicorn[standard]==0.29.0
 pydantic==2.7.1
 InquirerPy==0.3.4
 requests==2.31.0
+python-dotenv==1.0.1
