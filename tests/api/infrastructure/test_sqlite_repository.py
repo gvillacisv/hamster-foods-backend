@@ -15,47 +15,95 @@ def test_get_customer_by_id(database, repository):
 
     assert customer.name == 'Hamster King'
 
+
 def test_get_orders_for_customer_since(database, repository):
     database.fetchall.return_value = [
         {
-            'id': 'o1', 'customer_id': 'c1', 'amount_value': 10, 
-            'amount_currency': 'EUR', 'amount_base': 10, 
+            'id': 'o1', 'customer_id': 'c1', 'amount_value': 10,
+            'amount_currency': 'EUR', 'amount_base': 10,
             'exchange_rate': 1, 'created_at': '2023-10-10 10:00:00'
         }
     ]
-    
+
     date_from = datetime(2023, 10, 1)
     orders = repository.get_orders_for_customer_since('c1', date_from)
-    
+
     expected_date_str = '2023-10-01 00:00:00'
     args, _ = database.execute.call_args
     assert expected_date_str in args[1]
     assert len(orders) == 1
 
-@patch('api.domain.services.get_tier_for_amount')
-def test_sync_user_tier_no_change(mock_get_tier, database, repository):
-    database.fetchone.side_effect = [
-        {'tier': 'Rookie', 'total_base_at_change': 10.0},
-        {'total': 10.0}
-    ]
 
-    mock_get_tier.return_value = Tier.ROOKIE
+def test_get_current_tier_with_history(database, repository):
+    """get_current_tier returns (Tier, total) when history exists."""
+    database.fetchone.return_value = {'tier': 'Rookie', 'total_base_at_change': 10.0}
 
-    repository.sync_user_tier('c-01', 'EXPIRATION')
+    tier, total = repository.get_current_tier('c-01')
 
-    for call in database.execute.call_args_list:
-        assert "INSERT INTO tier_history" not in call[0][0]
+    assert tier == Tier.ROOKIE
+    assert total == 10.0
 
-@patch('api.domain.services.get_tier_for_amount')
-def test_sync_user_tier_with_change(mock_get_tier, database, repository):
-    database.fetchone.side_effect = [
-        {'tier': 'Rookie', 'total_base_at_change': 10.0},
-        {'total': 100.0}
-    ]
 
-    mock_get_tier.return_value = Tier.CHAMPION
+def test_get_current_tier_no_history(database, repository):
+    """get_current_tier returns (NO_TIER, -1.0) when no history."""
+    database.fetchone.return_value = None
 
-    repository.sync_user_tier('c-01', 'TRANSACTION')
+    tier, total = repository.get_current_tier('c-01')
 
-    insert_called = any("INSERT INTO tier_history" in call[0][0] for call in database.execute.call_args_list)
-    assert insert_called is True
+    assert tier == Tier.NO_TIER
+    assert total == -1.0
+
+
+def test_get_order_total_since(database, repository):
+    """get_order_total_since returns rounded sum."""
+    database.fetchone.return_value = {'total': 25.5}
+
+    total = repository.get_order_total_since('c-01', datetime(2023, 10, 1))
+
+    assert total == 25.5
+
+
+def test_get_order_total_since_no_orders(database, repository):
+    """get_order_total_since returns 0.0 when no orders."""
+    database.fetchone.return_value = {'total': None}
+
+    total = repository.get_order_total_since('c-01', datetime(2023, 10, 1))
+
+    assert total == 0.0
+
+
+def test_insert_tier_history(database, repository):
+    """insert_tier_history inserts a record via SQL."""
+    record = {
+        'id': 'th-01',
+        'customer_id': 'c-01',
+        'order_id': 'o-01',
+        'tier': 'Rookie',
+        'date': '2023-10-10T10:00:00',
+        'total_base_at_change': 10.0,
+        'change_reason': 'TRANSACTION'
+    }
+
+    repository.insert_tier_history(record)
+
+    args, _ = database.execute.call_args
+    assert "INSERT INTO tier_history" in args[0]
+    assert args[1] == ('th-01', 'c-01', 'o-01', 'Rookie', '2023-10-10T10:00:00', 10.0, 'TRANSACTION')
+
+
+def test_tier_already_synced_for_order_true(database, repository):
+    """tier_already_synced_for_order returns True when row exists."""
+    database.fetchone.return_value = (1,)
+
+    result = repository.tier_already_synced_for_order('o-01')
+
+    assert result is True
+
+
+def test_tier_already_synced_for_order_false(database, repository):
+    """tier_already_synced_for_order returns False when no row."""
+    database.fetchone.return_value = None
+
+    result = repository.tier_already_synced_for_order('o-01')
+
+    assert result is False

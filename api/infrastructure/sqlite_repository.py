@@ -1,15 +1,11 @@
 import sqlite3
-import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional, List
 
-import api.domain.services as domain_services
 from api.application.ports import CustomerRepository
 from api.domain.constants import Tier
 from api.domain.models import Customer, Order, TierHistoryItem
 from api.infrastructure.config import get_database_url
-
-logger = logging.getLogger(__name__)
 
 
 def get_db_connection():
@@ -89,66 +85,60 @@ class SqliteCustomerRepository(CustomerRepository):
 
         return history
 
-    def sync_user_tier(self, customer_id: str, reason: str, order_id: Optional[str] = None):
+    def get_current_tier(self, customer_id: str) -> tuple:
         with get_db_connection() as connection:
             cursor = connection.cursor()
-            cursor.execute("BEGIN IMMEDIATE")
+            cursor.execute(
+                "SELECT tier, total_base_at_change FROM tier_history WHERE customer_id = ? ORDER BY date DESC LIMIT 1",
+                (customer_id,)
+            )
 
-            try:
-                if order_id:
-                    cursor.execute(
-                        "SELECT 1 FROM tier_history WHERE order_id = ?", (order_id,)
-                    )
+            row = cursor.fetchone()
 
-                    if cursor.fetchone():
-                        connection.commit()
-                        return
+            if row:
+                return Tier(row['tier']), row['total_base_at_change']
 
-                cursor.execute(
-                    "SELECT tier, total_base_at_change FROM tier_history WHERE customer_id = ? ORDER BY date DESC LIMIT 1",
-                    (customer_id,)
+            return Tier.NO_TIER, -1.0
+
+    def get_order_total_since(self, customer_id: str, date_from: datetime) -> float:
+        with get_db_connection() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                "SELECT SUM(amount_base) as total FROM orders WHERE customer_id = ? AND created_at >= ?",
+                (customer_id, date_from.strftime('%Y-%m-%d %H:%M:%S'))
+            )
+
+            row = cursor.fetchone()
+
+            if row and row['total'] is not None:
+                return round(row['total'], 2)
+
+            return 0.0
+
+    def insert_tier_history(self, record: dict) -> None:
+        with get_db_connection() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                INSERT INTO tier_history (id, customer_id, order_id, tier, date, total_base_at_change, change_reason)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record['id'],
+                    record['customer_id'],
+                    record.get('order_id'),
+                    record['tier'],
+                    record['date'],
+                    record['total_base_at_change'],
+                    record['change_reason']
                 )
+            )
 
-                last_history_row = cursor.fetchone()
-                current_tier = Tier(last_history_row['tier']) if last_history_row else Tier.NO_TIER
-                last_recorded_total = last_history_row['total_base_at_change'] if last_history_row else -1.0
-                ten_days_ago = datetime.now() - timedelta(days=10)
+            connection.commit()
 
-                cursor.execute(
-                    "SELECT SUM(amount_base) as total FROM orders WHERE customer_id = ? AND created_at >= ?",
-                    (customer_id, ten_days_ago.strftime('%Y-%m-%d %H:%M:%S'))
-                )
+    def tier_already_synced_for_order(self, order_id: str) -> bool:
+        with get_db_connection() as connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT 1 FROM tier_history WHERE order_id = ?", (order_id,))
 
-                total_row = cursor.fetchone()
-                current_total = total_row['total'] if total_row and total_row['total'] is not None else 0.0
-                current_total = round(current_total, 2)
-
-                new_tier = domain_services.get_tier_for_amount(current_total)
-                should_insert = (
-                    new_tier != current_tier or
-                    not last_history_row or
-                    (reason == 'TRANSACTION' and current_total != last_recorded_total)
-                )
-                if should_insert:
-                    cursor.execute(
-                        """
-                        INSERT INTO tier_history (id, customer_id, order_id, tier, date, total_base_at_change, change_reason)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
-                        """,
-                        (
-                            f"th-{customer_id}-{datetime.now().timestamp()}",
-                            customer_id,
-                            order_id,
-                            new_tier.value,
-                            datetime.now().isoformat(),
-                            current_total,
-                            reason
-                        )
-                    )
-
-                connection.commit()
-            except Exception as exception:
-                connection.rollback()
-                logger.error(f"Error syncing tier for customer {customer_id}: {exception}")
-
-                raise
+            return cursor.fetchone() is not None
