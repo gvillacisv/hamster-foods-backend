@@ -171,3 +171,66 @@ def test_sync_tier_returns_500_on_generic_exception(mock_services):
 
     assert response.status_code == 500
     assert "Failed to sync tier" in response.json()["detail"]
+
+
+def test_sync_tier_returns_success(mock_services):
+    """sync_tier MUST return 200 with success message when no error."""
+    from main import app
+
+    mock_tier_service, mock_sync_service = mock_services
+
+    client = TestClient(app)
+    os.environ["API_KEY"] = "test-api-key-123"
+    response = client.post(
+        "/api/v1/customers/customer-123/sync-tier",
+        json={"reason": "manual", "order_id": "order-456"},
+        headers={"X-API-Key": "test-api-key-123"}
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "success"
+    assert "customer-123" in body["message"]
+
+
+def test_auth_disabled_passthrough_reaches_endpoint(mock_services):
+    """When require_auth is overridden with passthrough, unauthenticated requests reach the endpoint."""
+    from main import app
+    from api.infrastructure import http_api as http_api_module
+
+    original_require_auth = http_api_module.require_auth
+    try:
+        http_api_module.require_auth = lambda: None
+
+        client = TestClient(app)
+        mock_tier_service, _ = mock_services
+        mock_tier_service.get_customer_tier_status.side_effect = CustomerNotFound("c-999")
+
+        response = client.get(
+            "/api/v1/customers/c-999/tier-status",
+        )
+
+        # Should get 404 from service (not 401/403 from auth), proving auth was skipped
+        assert response.status_code == 404
+    finally:
+        http_api_module.require_auth = original_require_auth
+
+
+def test_get_auth_dependency_returns_lambda_when_no_api_key():
+    """get_auth_dependency must return a passthrough lambda when API_KEY is not set."""
+    from api.infrastructure.http_api import get_auth_dependency
+
+    with patch.dict(os.environ, {}, clear=True):
+        auth_dep = get_auth_dependency()
+        # Should be a lambda that returns None
+        assert auth_dep() is None
+
+
+def test_get_auth_dependency_returns_require_api_key_when_configured():
+    """get_auth_dependency must return require_api_key when API_KEY is set."""
+    from api.infrastructure.http_api import get_auth_dependency
+    from api.infrastructure.auth import require_api_key
+
+    with patch.dict(os.environ, {"API_KEY": "secret"}):
+        auth_dep = get_auth_dependency()
+        assert auth_dep is require_api_key
