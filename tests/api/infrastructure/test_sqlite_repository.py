@@ -107,3 +107,69 @@ def test_tier_already_synced_for_order_false(database, repository):
     result = repository.tier_already_synced_for_order('o-01')
 
     assert result is False
+
+
+def test_get_customer_by_id_not_found(database, repository):
+    """get_customer_by_id returns None when customer does not exist."""
+    database.fetchone.return_value = None
+
+    customer = repository.get_customer_by_id('nonexistent')
+
+    assert customer is None
+
+
+def test_get_tier_history_desc(database, repository):
+    """get_tier_history_desc returns tier history ordered by date desc."""
+    database.fetchall.return_value = [
+        {
+            'id': 'th-02', 'tier': 'Champion', 'date': '2023-11-01T10:00:00',
+            'total_base_at_change': 25.0, 'change_reason': 'TRANSACTION'
+        },
+        {
+            'id': 'th-01', 'tier': 'Rookie', 'date': '2023-10-01T10:00:00',
+            'total_base_at_change': 7.5, 'change_reason': 'TRANSACTION'
+        },
+    ]
+
+    history = repository.get_tier_history_desc('c-01')
+
+    assert len(history) == 2
+    assert history[0].tier == Tier.CHAMPION
+    assert history[0].id == 'th-02'
+    assert history[1].tier == Tier.ROOKIE
+    assert history[1].id == 'th-01'
+
+    database.execute.assert_called_once()
+    args, _ = database.execute.call_args
+    assert "ORDER BY date DESC" in args[0]
+
+
+def test_get_tier_history_desc_empty(database, repository):
+    """get_tier_history_desc returns empty list when no history."""
+    database.fetchall.return_value = []
+
+    history = repository.get_tier_history_desc('c-01')
+
+    assert history == []
+
+
+def test_get_db_connection():
+    """get_db_connection returns a sqlite3 connection with Row factory."""
+    from api.infrastructure.sqlite_repository import get_db_connection
+    import tempfile
+    import os as os_mod
+
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+        db_path = f.name
+
+    try:
+        with patch('api.infrastructure.sqlite_repository.get_database_url', return_value=db_path):
+            conn = get_db_connection()
+            assert conn is not None
+            # Verify row_factory is set to Row
+            import sqlite3
+            assert conn.row_factory == sqlite3.Row
+            conn.close()
+    finally:
+        if os_mod.path.exists(db_path):
+            os_mod.remove(db_path)
