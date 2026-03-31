@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 
 from api.application.customer_service import CustomerTierService, CustomerNotFound
+from api.application.sync_tier_service import SyncTierService
+from api.application.ports import CustomerRepository
 from api.domain.models import CustomerTierStatusResponse, SyncTierRequest
-from api.infrastructure.dependencies import get_customer_tier_service, get_customer_repository
-from api.infrastructure.sqlite_repository import SqliteCustomerRepository
+from api.infrastructure.dependencies import get_customer_tier_service, get_sync_tier_service
 from api.infrastructure.auth import require_api_key
 from api.infrastructure.config import get_api_key
 
@@ -38,7 +39,7 @@ def get_tier_status(
 ):
     """
     Get customer's current tier status.
-    
+
     Requires API key authentication if API_KEY is configured.
     """
     try:
@@ -58,16 +59,16 @@ def get_tier_status(
 def sync_tier(
     customer_id: str,
     request: SyncTierRequest,
-    repository: SqliteCustomerRepository = Depends(get_customer_repository),
+    sync_service: SyncTierService = Depends(get_sync_tier_service),
     _: None = Depends(require_auth)
 ):
     """
     Trigger a manual tier synchronization for a customer.
-    
+
     Requires API key authentication if API_KEY is configured.
     """
     try:
-        repository.sync_user_tier(customer_id, request.reason, request.order_id)
+        sync_service.sync_user_tier(customer_id, request.reason, request.order_id)
 
         return {"status": "success", "message": f"Tier synchronization completed for customer {customer_id}."}
     except Exception as exception:
