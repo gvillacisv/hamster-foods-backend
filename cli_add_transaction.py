@@ -6,14 +6,11 @@ import requests
 from InquirerPy import inquirer
 from InquirerPy.validator import NumberValidator
 
+from api.domain.constants import RATES_TO_BASE
+
 API_BASE_URL = "http://localhost:8000/api/v1"
 DB_FILE = os.path.join(os.path.dirname(__file__), '.', 'hamster_foods.db')
 
-RATES_TO_BASE = {
-    "EUR": 1.0,
-    "GBP": 1.18,
-    "USD": 0.93,
-}
 SUPPORTED_CURRENCIES = list(RATES_TO_BASE.keys())
 
 def get_db_connection():
