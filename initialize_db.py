@@ -19,6 +19,7 @@ def initialize_database():
         os.remove(DB_FILE)
         print(f"Removed old database file: {DB_FILE}")
 
+    connection = None
     try:
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()

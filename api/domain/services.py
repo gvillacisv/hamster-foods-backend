@@ -25,6 +25,9 @@ def get_next_tier_info(current_total: float, current_tier: Tier, thresholds: dic
 
             break
 
+    if current_tier_index == -1:
+        raise ValueError(f"Tier {current_tier} not found in thresholds")
+
     next_tier, next_tier_threshold = listed_thresholds[current_tier_index - 1]
     amount_needed = next_tier_threshold - current_total
 

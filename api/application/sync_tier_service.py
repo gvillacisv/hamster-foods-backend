@@ -26,7 +26,7 @@ class SyncTierService:
         should_insert = (
             new_tier != current_tier or
             last_recorded_total < 0 or
-            (reason == 'TRANSACTION' and current_total != last_recorded_total)
+            (reason == 'TRANSACTION' and abs(current_total - last_recorded_total) > 0.005)
         )
 
         if should_insert:
