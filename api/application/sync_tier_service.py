@@ -1,4 +1,5 @@
 import logging
+import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -30,7 +31,7 @@ class SyncTierService:
 
         if should_insert:
             self._customer_repository.insert_tier_history({
-                'id': f"th-{customer_id}-{datetime.now().timestamp()}",
+                'id': f"th-{customer_id}-{uuid.uuid4().hex[:10]}",
                 'customer_id': customer_id,
                 'order_id': order_id,
                 'tier': new_tier.value,
