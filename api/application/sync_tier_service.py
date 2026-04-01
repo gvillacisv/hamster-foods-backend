@@ -4,13 +4,13 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import api.domain.services as domain_services
-from api.application.ports import CustomerRepository
+from api.application.ports import TierMutationPort
 
 logger = logging.getLogger(__name__)
 
 
 class SyncTierService:
-    def __init__(self, customer_repository: CustomerRepository):
+    def __init__(self, customer_repository: TierMutationPort):
         self._customer_repository = customer_repository
 
     def sync_user_tier(self, customer_id: str, reason: str, order_id: Optional[str] = None):

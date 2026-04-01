@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 import api.domain.services as domain_services
-from api.application.ports import CurrencyConverter, CustomerRepository
+from api.application.ports import CurrencyConverter, CustomerQueryPort
 from api.domain.constants import BASE_CURRENCY
 from api.domain.models import CustomerTierStatusResponse
 
@@ -10,7 +10,7 @@ class CustomerNotFound(Exception):
     pass
 
 class CustomerTierService:
-    def __init__(self, customer_repository: CustomerRepository, currency_converter: CurrencyConverter):
+    def __init__(self, customer_repository: CustomerQueryPort, currency_converter: CurrencyConverter):
         self._customer_repository = customer_repository
         self._currency_converter = currency_converter
 

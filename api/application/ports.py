@@ -12,7 +12,7 @@ class CurrencyConverter(ABC):
         raise NotImplementedError
 
 
-class CustomerRepository(ABC):
+class CustomerQueryPort(ABC):
 
     @abstractmethod
     def get_customer_by_id(self, customer_id: str) -> Optional[Customer]:
@@ -25,6 +25,9 @@ class CustomerRepository(ABC):
     @abstractmethod
     def get_tier_history_desc(self, customer_id: str) -> list[TierHistoryItem]:
         raise NotImplementedError
+
+
+class TierMutationPort(ABC):
 
     @abstractmethod
     def get_current_tier(self, customer_id: str) -> tuple:
@@ -42,3 +45,8 @@ class CustomerRepository(ABC):
     @abstractmethod
     def tier_already_synced_for_order(self, order_id: str) -> bool:
         raise NotImplementedError
+
+
+# Backward compatibility: CustomerRepository combines both ports
+class CustomerRepository(CustomerQueryPort, TierMutationPort):
+    pass
