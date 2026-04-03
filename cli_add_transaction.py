@@ -9,7 +9,7 @@ from InquirerPy.validator import NumberValidator
 from api.domain.constants import RATES_TO_BASE
 
 API_BASE_URL = "http://localhost:8000/api/v1"
-DB_FILE = os.path.join(os.path.dirname(__file__), '.', 'hamster_foods.db')
+DB_FILE = os.path.join(os.path.dirname(__file__), '.', 'tier_status.db')
 
 SUPPORTED_CURRENCIES = list(RATES_TO_BASE.keys())
 
@@ -168,7 +168,7 @@ def process_transaction_details(customer_id):
         print("\nTransaction cancelled.")
 
 def main():
-    print("--- Hamster Foods Transaction CLI ---\n")
+    print("--- Transaction CLI ---\n")
 
     while True:
         action = inquirer.select(

@@ -16,7 +16,7 @@ def get_cors_origins() -> List[str]:
 
 def get_database_url() -> str:
     """Get database path from environment or use default."""
-    return os.getenv("DATABASE_URL", "hamster_foods.db")
+    return os.getenv("DATABASE_URL", "tier_status.db")
 
 
 def get_api_key() -> Optional[str]:

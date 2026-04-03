@@ -34,7 +34,7 @@ def test_get_database_url_uses_env():
 def test_get_database_url_default():
     """Returns default path when DATABASE_URL is not set."""
     with patch.dict(os.environ, {}, clear=True):
-        assert get_database_url() == "hamster_foods.db"
+        assert get_database_url() == "tier_status.db"
 
 
 def test_get_api_key_returns_none_when_not_set():

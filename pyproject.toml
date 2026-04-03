@@ -2,14 +2,14 @@
 requires = ["setuptools>=61.0", "wheel"]
 
 [project]
-name = "hamster-foods-backend"
+name = "fastapi-tier-backend"
 version = "1.0.0"
-description = "FastAPI backend for Hamster Foods Tier Status application"
+description = "FastAPI backend demonstrating tier status and loyalty system patterns"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Hamster Foods Team", email = "dev@hamsterfoods.com"}
+    {name = "Demo Developer", email = "demo@example.com"}
 ]
 keywords = ["fastapi", "tier-system", "loyalty", "api"]
 classifiers = [
@@ -40,7 +40,7 @@ dev = [
 ]
 
 [project.scripts]
-hamster-foods = "main:app"
+tier-backend = "main:app"
 
 [tool.setuptools]
 packages = ["api"]
