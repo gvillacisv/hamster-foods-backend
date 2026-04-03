@@ -1,51 +1,59 @@
-# Backend API
+# FastAPI Tier Status Backend
 
-This is the FastAPI backend for the Hamster Foods Tier Status application.
+This is a demo/portfolio project showcasing a FastAPI backend implementing a tier status and loyalty system. Built with assistance from Agentic AI for learning and demonstration purposes.
+
+## Purpose
+
+This project demonstrates:
+- FastAPI REST API development
+- SQLite database with tier status tracking
+- Currency exchange and rolling window calculations
+- Interactive CLI tool for database manipulation
 
 ## Setup
 
-1.  **Create a virtual environment:**
+1. **Create a virtual environment:**
     ```bash
     python -m venv venv
     ```
 
-2.  **Activate the virtual environment:**
+2. **Activate the virtual environment:**
     - On macOS/Linux: `source venv/bin/activate`
     - On Windows: `.\venv\Scripts\activate`
 
-3.  **Install dependencies:**
+3. **Install dependencies:**
     For a production-only environment, use `requirements.txt`:
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Configure environment variables:**
+4. **Configure environment variables:**
     Copy `.env.example` to `.env` and configure:
     ```bash
     cp .env.example .env
     ```
     
     Key configuration options:
-    - `DATABASE_URL` - Path to SQLite database (default: `hamster_foods.db`)
+    - `DATABASE_URL` - Path to SQLite database (default: `tier_status.db`)
     - `API_KEY` - Set to enable API key authentication (leave empty for dev mode)
     - `CORS_ORIGINS` - Comma-separated list of allowed origins (e.g., `http://localhost:3000`)
     - `DEBUG` - Set to `true` for debug mode
 
-5.  **Initialize the database:**
-    This command will create `hamster_foods.db` and populate it with schema and seed data. Run this once during setup.
+5. **Initialize the database:**
+    This command will create `tier_status.db` and populate it with schema and seed data. Run this once during setup.
     ```bash
     python initialize_db.py
     ```
 
 ## Test
 
-1.  **Install dependencies:**
+1. **Install dependencies:**
     For a development environment, use `requirements-dev.txt`:
     ```bash
     pip install -r requirements-dev.txt
     ```
 
-2.  **Run tests*:*
+2. **Run tests:**
     ```bash
     pytest
     ```
