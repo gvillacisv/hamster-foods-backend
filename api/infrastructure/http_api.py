@@ -15,7 +15,7 @@ router = APIRouter()
 def get_auth_dependency():
     """Get authentication dependency based on API key configuration."""
     api_key = get_api_key()
-    if api_key is None:
+    if api_key is None or api_key == "":
         # No API key configured - auth disabled (dev mode)
         return lambda: None
     return require_api_key
