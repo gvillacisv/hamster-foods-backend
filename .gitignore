@@ -25,6 +25,7 @@ htmlcov/
 
 # SDD artifacts
 openspec/
+.atl/
 
 # Other
 .DS_Store
