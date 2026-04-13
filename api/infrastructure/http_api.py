@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, status, Depends, Query
 
 from api.application.customer_service import CustomerTierService, CustomerNotFound
 from api.application.sync_tier_service import SyncTierService
-from api.application.ports import CustomerRepository
 from api.domain.models import CustomerTierStatusResponse, SyncTierRequest
 from api.infrastructure.dependencies import get_customer_tier_service, get_sync_tier_service
 from api.infrastructure.auth import require_api_key
