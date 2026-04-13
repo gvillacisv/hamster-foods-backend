@@ -85,7 +85,7 @@ class SqliteCustomerRepository(CustomerRepository):
 
         return history
 
-    def get_current_tier(self, customer_id: str) -> tuple:
+    def get_current_tier(self, customer_id: str) -> tuple[Tier, float]:
         with get_db_connection() as connection:
             cursor = connection.cursor()
             cursor.execute(
