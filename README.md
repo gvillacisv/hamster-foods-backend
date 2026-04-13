@@ -80,7 +80,7 @@ This project demonstrates:
 
 To recreate the database from scratch:
 ```bash
-rm tier_status.db hamster_foods.db 2>/dev/null
+rm tier_status.db 2>/dev/null
 python initialize_db.py
 ```
 

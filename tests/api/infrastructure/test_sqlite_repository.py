@@ -5,7 +5,7 @@ from api.domain.constants import Tier
 
 
 def test_get_customer_by_id(database, repository):
-    database.fetchone.return_value = {'id': 'c-01', 'name': 'Hamster King'}
+    database.fetchone.return_value = {'id': 'c-01', 'name': 'Test Customer'}
 
     customer = repository.get_customer_by_id('c-01')
 
@@ -13,7 +13,7 @@ def test_get_customer_by_id(database, repository):
         "SELECT id, name FROM customers WHERE id = ?", ('c-01',)
     )
 
-    assert customer.name == 'Hamster King'
+    assert customer.name == 'Test Customer'
 
 
 def test_get_orders_for_customer_since(database, repository):
