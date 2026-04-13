@@ -2,6 +2,19 @@
 
 This is a demo/portfolio project showcasing a FastAPI backend implementing a tier status and loyalty system. Built with assistance from Agentic AI for learning and demonstration purposes.
 
+## Quick Start
+
+```bash
+# Clone and setup (one-liner)
+python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && cp .env.example .env && python initialize_db.py
+
+# Run tests
+pytest
+
+# Start server
+uvicorn main:app --reload
+```
+
 ## Purpose
 
 This project demonstrates:
@@ -57,6 +70,28 @@ This project demonstrates:
     ```bash
     pytest
     ```
+
+3. **Run tests with coverage:**
+    ```bash
+    pytest --cov=api --cov-report=term-missing
+    ```
+
+## Reset the Database
+
+To recreate the database from scratch:
+```bash
+rm tier_status.db hamster_foods.db 2>/dev/null
+python initialize_db.py
+```
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `ModuleNotFoundError` | Ensure venv is activated: `source venv/bin/activate` |
+| `No module named pytest` | Install dev deps: `pip install -r requirements-dev.txt` |
+| Port 8000 in use | Kill process: `lsof -ti:8000 \| xargs kill` or use `uvicorn --port 8001` |
+| Database locked | Delete `.db-journal` files: `rm *.db-journal` |
 
 ## Running the API
 
